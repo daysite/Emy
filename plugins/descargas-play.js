@@ -1,36 +1,99 @@
 import fetch from "node-fetch";
 import yts from 'yt-search';
 
+// Sistema de cache y configuraciones
+const videoCache = {};
+const cacheTimeout = 10 * 60 * 1000; // 10 minutos
+const MAX_FILE_SIZE_MB = 100;
+
+// Acortador de URLs
+const shortenURL = async (url) => {
+  try {
+    let response = await fetch(`https://tinyurl.com/api-create.php?url=${encodeURIComponent(url)}`);
+    let shortUrl = await response.text();
+    return shortUrl.includes("http") ? shortUrl : url;
+  } catch {
+    return url;
+  }
+};
+
+// APIs de descarga
+const fetchAPI = async (url, type) => {
+  try {
+    const endpoints = {
+      audio: `https://dark-core-api.vercel.app/api/download/YTMP3?key=api&url=${url}`,
+      video: `https://dark-core-api.vercel.app/api/download/ytmp4/v2?key=api&url=${url}`,
+    };
+    let response = await fetch(endpoints[type]);
+    let data = await response.json();
+    if (data?.download) return data;
+
+    throw new Error("API principal no respondió correctamente.");
+  } catch (error) {
+    console.log("Error en API principal:", error.message);
+    try {
+      const fallbackEndpoints = {
+        audio: `https://api.neoxr.eu/api/youtube?url=${url}&type=audio&quality=128kbps&apikey=GataDios`,
+        video: `https://api.neoxr.eu/api/youtube?url=${url}&type=video&quality=720p&apikey=GataDios`,
+      };
+      let response = await fetch(fallbackEndpoints[type]);
+      let data = await response.json();
+      if (data?.data?.url) {
+        return {
+          download: data.data.url,
+          title: data.data.title,
+          filesize: data.data.filesize,
+          duration: data.data.duration,
+          channel: data.data.channel,
+        };
+      }
+      throw new Error("API de respaldo no respondió correctamente.");
+    } catch (error) {
+      console.log("Error en API de respaldo:", error.message);
+      return null;
+    }
+  }
+};
+
 const handler = async (m, { conn, text, usedPrefix, command }) => {
   let user = global.db.data.users[m.sender];
 
+  // Verificar chocolates
   if (user.chocolates < 2) {
-    return conn.reply(m.chat, `🎵 *Faltan Chocolates* 🍫\nNecesitas 2 chocolates más para usar este comando.`, m);
+    return conn.reply(m.chat, 
+      `🎵 *Faltan Chocolates* 🍫\nNecesitas 2 chocolates más para usar este comando.\n\n💎 *Tus chocolates:* ${user.chocolates}`, 
+      m
+    );
   }
 
   try {
     if (!text.trim()) {
-      return conn.reply(m.chat, `🎵 *Búsqueda de Música*\nPor favor, ingresa el nombre de la canción.`, m);
+      return conn.reply(m.chat, 
+        `🎵 *Búsqueda de Música*\nPor favor, ingresa el nombre de la canción.\n\n💡 *Ejemplo:* ${usedPrefix}play bad bunny`, 
+        m
+      );
     }
 
+    // Mensaje de búsqueda
     await conn.sendMessage(m.chat, { 
       text: `🔍 *Buscando...*\n\"${text}\"` 
     }, { quoted: m });
 
     const search = await yts(text);
     if (!search.all || search.all.length === 0) {
-      return m.reply('❌ *No se encontraron resultados*');
+      return m.reply('❌ *No se encontraron resultados*\nPrueba con otro nombre de canción.');
     }
 
+    // Tomar el primer resultado automáticamente
     const videoInfo = search.all[0];
     const { title, thumbnail, timestamp, views, ago, url, author } = videoInfo;
 
     const vistas = formatViews(views);
     const canal = author.name || 'Desconocido';
 
-    // Información del audio
+    // Mostrar información del video encontrado
     const infoMessage = `
-🎧 *INFORMACIÓN DEL AUDIO*
+🎧 *INFORMACIÓN ENCONTRADA*
 
 📌 *Título:* ${title}
 ⏱️ *Duración:* ${timestamp}
@@ -38,92 +101,158 @@ const handler = async (m, { conn, text, usedPrefix, command }) => {
 📺 *Canal:* ${canal}
 📅 *Publicado:* ${ago}
 
-⬇️ *Descargando audio...*`;
+💡 *Responde con:* 
+• "audio" 🎵 para descargar audio
+• "video" 🎬 para descargar video
+
+🍫 *Costo:* 2 chocolates`;
 
     const thumb = (await conn.getFile(thumbnail))?.data;
     
+    // Guardar información en cache para procesar la respuesta
+    videoCache[m.sender] = {
+      url: url,
+      title: title,
+      timestamp: Date.now()
+    };
+
     await conn.sendMessage(m.chat, {
       image: thumb,
       caption: infoMessage
     }, { quoted: m });
 
-    // 🔄 NUEVAS APIs MÁS CONFIABLES
-    const apis = [
-      // API 1 - Más estable
-      `https://api.akuari.my.id/downloader/youtube2?link=${url}`,
-      
-      // API 2 - Alternativa confiable
-      `https://api.lolhuman.xyz/api/ytplay2?apikey=your_key&query=${encodeURIComponent(title)}`,
-      
-      // API 3 - Respaldo
-      `https://api.download-lagu-mp3.com/@api/button/mp3/${url.split('v=')[1]}`,
-      
-      // API 4 - Último recurso
-      `https://ytmp3.cx/api/convert?url=${url}`
-    ];
-
-    let audioUrl = null;
-    let audioTitle = title;
-
-    // Probar cada API hasta que una funcione
-    for (let api of apis) {
-      try {
-        console.log(`Probando API: ${api}`);
-        const response = await fetch(api, { timeout: 10000 });
-        
-        if (response.ok) {
-          const data = await response.json();
-          
-          // Diferentes estructuras de respuesta
-          if (data.result && data.result.audio) {
-            audioUrl = data.result.audio;
-            break;
-          } else if (data.url) {
-            audioUrl = data.url;
-            break;
-          } else if (data.link) {
-            audioUrl = data.link;
-            break;
-          } else if (data.data && data.data.audio) {
-            audioUrl = data.data.audio;
-            break;
-          }
-        }
-      } catch (e) {
-        console.log(`API falló: ${e.message}`);
-        continue;
-      }
-    }
-
-    if (audioUrl) {
-      // ✅ Éxito - Enviar audio
-      await conn.sendMessage(m.chat, { 
-        audio: { url: audioUrl }, 
-        fileName: `${audioTitle}.mp3`, 
-        mimetype: 'audio/mpeg' 
-      }, { quoted: m });
-
-      user.chocolates -= 2;
-      await conn.sendMessage(m.chat, { 
-        text: `✅ *Descarga exitosa!*\n🍫 *Chocolates usados:* 2\n💎 *Restantes:* ${user.chocolates}` 
-      });
-
-    } else {
-      // ❌ Todas las APIs fallaron
-      await conn.sendMessage(m.chat, { 
-        text: `❌ *Error crítico de descarga*\n\n📡 *Estado:* Todas las APIs están offline\n🕒 *Solución:* Intenta en 1-2 horas\n\n💡 *Alternativa:* Usa YouTube directamente` 
-      });
-    }
-
   } catch (error) {
     console.error(error);
     await conn.sendMessage(m.chat, { 
-      text: `💥 *Error del sistema*\n${error.message}` 
+      text: `💥 *Error en la búsqueda*\n${error.message}` 
     }, { quoted: m });
   }
 };
 
-handler.command = handler.help = ['play', 'mp3', 'playaudio'];
+// Handler para procesar respuestas "audio" o "video"
+handler.before = async (m, { conn }) => {
+  // Solo procesar si es respuesta a un mensaje del bot
+  if (!m.quoted || !m.quoted.text.includes("INFORMACIÓN ENCONTRADA")) return;
+
+  const userInput = m.text.toLowerCase().trim();
+  let user = global.db.data.users[m.sender];
+
+  // Verificar si el usuario tiene chocolates suficientes
+  if (user.chocolates < 2) {
+    return conn.reply(m.chat, 
+      `❌ *Chocolates insuficientes*\nNecesitas 2 chocolates para descargar.\n\n💎 *Tus chocolates:* ${user.chocolates}`, 
+      m
+    );
+  }
+
+  // Verificar cache
+  if (!videoCache[m.sender] || Date.now() - videoCache[m.sender].timestamp > cacheTimeout) {
+    delete videoCache[m.sender];
+    return conn.reply(m.chat, 
+      "❌ *La sesión expiró*\nPor favor, realiza una nueva búsqueda.", 
+      m
+    );
+  }
+
+  const { url, title } = videoCache[m.sender];
+
+  try {
+    let mediaType, responseMessage, fileName, mimetype, caption;
+
+    if (userInput === 'audio') {
+      mediaType = 'audio';
+      responseMessage = '🎶 *Descargando audio...*\nPor favor espera.';
+      fileName = `${title}.mp3`;
+      mimetype = 'audio/mpeg';
+      caption = '🎵 *¡Audio descargado!*';
+      
+    } else if (userInput === 'video') {
+      mediaType = 'video';
+      responseMessage = '🎬 *Descargando video...*\nPor favor espera.';
+      fileName = `${title}.mp4`;
+      mimetype = 'video/mp4';
+      caption = `🎬 *${title}*\n✅ Video descargado exitosamente`;
+      
+    } else {
+      return conn.reply(m.chat, 
+        `❌ *Opción no válida*\nSolo responde con:\n• "audio" 🎵\n• "video" 🎬`, 
+        m
+      );
+    }
+
+    // Enviar mensaje de progreso
+    await conn.reply(m.chat, responseMessage, m);
+
+    // Obtener enlace de descarga
+    let apiData = await fetchAPI(url, mediaType);
+
+    if (!apiData || !apiData.download) {
+      return conn.reply(m.chat, 
+        "❌ *Error en la descarga*\nNo se pudo obtener el enlace. Intenta más tarde.", 
+        m
+      );
+    }
+
+    // Acortar URL si es necesario
+    let downloadUrl = await shortenURL(apiData.download);
+    
+    // Verificar tamaño del archivo
+    let fileSizeMB = apiData.filesize ? parseFloat(apiData.filesize) / (1024 * 1024) : null;
+    let asDocument = fileSizeMB && fileSizeMB > MAX_FILE_SIZE_MB;
+
+    if (asDocument) {
+      await conn.reply(m.chat, 
+        "📦 *Archivo muy grande*\nSe enviará como documento.", 
+        m
+      );
+    }
+
+    // Preparar mensaje según el tipo
+    let messageOptions;
+    if (asDocument) {
+      messageOptions = { 
+        document: { url: downloadUrl }, 
+        fileName, 
+        mimetype: mimetype,
+        caption: caption
+      };
+    } else if (mediaType === 'audio') {
+      messageOptions = { 
+        audio: { url: downloadUrl }, 
+        mimetype: "audio/mpeg", 
+        fileName: fileName
+      };
+    } else {
+      messageOptions = { 
+        video: { url: downloadUrl }, 
+        caption: caption 
+      };
+    }
+
+    // Enviar archivo
+    await conn.sendMessage(m.chat, messageOptions, { quoted: m });
+
+    // Restar chocolates después del éxito
+    user.chocolates -= 2;
+    
+    // Mensaje de confirmación
+    await conn.sendMessage(m.chat, { 
+      text: `✅ *Descarga exitosa!*\n🍫 *Chocolates usados:* 2\n💎 *Restantes:* ${user.chocolates}` 
+    });
+
+    // Limpiar cache
+    delete videoCache[m.sender];
+
+  } catch (error) {
+    console.error(error);
+    await conn.reply(m.chat, 
+      `❌ *Error en la descarga*\n${error.message}`, 
+      m
+    );
+  }
+};
+
+handler.command = handler.help = ['play', 'mp3', 'playaudio', 'play2', 'mp4', 'playvideo'];
 handler.tags = ['downloader'];
 
 export default handler;
