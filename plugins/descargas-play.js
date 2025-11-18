@@ -1,12 +1,12 @@
 import fetch from "node-fetch";
 import yts from 'yt-search';
 
-// Sistema de cache (igual que tu código funcional)
+// Sistema de cache
 const videoCache = {};
 const cacheTimeout = 10 * 60 * 1000;
 const MAX_FILE_SIZE_MB = 100;
 
-// Acortador de URLs (exactamente igual)
+// Acortador de URLs
 const shortenURL = async (url) => {
   try {
     let response = await fetch(`https://tinyurl.com/api-create.php?url=${encodeURIComponent(url)}`);
@@ -17,7 +17,7 @@ const shortenURL = async (url) => {
   }
 };
 
-// MISMA función fetchAPI de tu código funcional
+// Función fetchAPI
 const fetchAPI = async (url, type) => {
   try {
     const endpoints = {
@@ -56,16 +56,6 @@ const fetchAPI = async (url, type) => {
 };
 
 const handler = async (m, { conn, text, usedPrefix, command }) => {
-  let user = global.db.data.users[m.sender];
-
-  // Verificar chocolates
-  if (user.chocolates < 2) {
-    return conn.reply(m.chat, 
-      `🎵 *Faltan Chocolates* 🍫\nNecesitas 2 chocolates más para usar este comando.\n\n💎 *Tus chocolates:* ${user.chocolates}`, 
-      m
-    );
-  }
-
   try {
     if (!text.trim()) {
       return conn.reply(m.chat, 
@@ -84,7 +74,7 @@ const handler = async (m, { conn, text, usedPrefix, command }) => {
       return m.reply('❌ *No se encontraron resultados*\nPrueba con otro nombre de canción.');
     }
 
-    // Tomar el primer resultado automáticamente (como quieres)
+    // Tomar el primer resultado automáticamente
     const videoInfo = search.all[0];
     const { title, thumbnail, timestamp, views, ago, url, author } = videoInfo;
 
@@ -103,9 +93,7 @@ const handler = async (m, { conn, text, usedPrefix, command }) => {
 
 💡 *Responde con:* 
 • "audio" 🎵 para descargar audio
-• "video" 🎬 para descargar video
-
-🍫 *Costo:* 2 chocolates`;
+• "video" 🎬 para descargar video`;
 
     const thumb = (await conn.getFile(thumbnail))?.data;
     
@@ -135,15 +123,6 @@ handler.before = async (m, { conn }) => {
   if (!m.quoted || !m.quoted.text.includes("INFORMACIÓN ENCONTRADA")) return;
 
   const userInput = m.text.toLowerCase().trim();
-  let user = global.db.data.users[m.sender];
-
-  // Verificar si el usuario tiene chocolates suficientes
-  if (user.chocolates < 2) {
-    return conn.reply(m.chat, 
-      `❌ *Chocolates insuficientes*\nNecesitas 2 chocolates para descargar.\n\n💎 *Tus chocolates:* ${user.chocolates}`, 
-      m
-    );
-  }
 
   // Verificar cache
   if (!videoCache[m.sender] || Date.now() - videoCache[m.sender].timestamp > cacheTimeout) {
@@ -183,7 +162,7 @@ handler.before = async (m, { conn }) => {
     // Enviar mensaje de progreso
     await conn.reply(m.chat, responseMessage, m);
 
-    // Obtener enlace de descarga - USANDO TU API FUNCIONAL
+    // Obtener enlace de descarga
     let apiData = await fetchAPI(url, mediaType);
 
     if (!apiData || !apiData.download) {
@@ -193,10 +172,10 @@ handler.before = async (m, { conn }) => {
       );
     }
 
-    // Acortar URL (igual que tu código)
+    // Acortar URL
     let downloadUrl = await shortenURL(apiData.download);
     
-    // Verificar tamaño del archivo (igual que tu código)
+    // Verificar tamaño del archivo
     let fileSizeMB = apiData.filesize ? parseFloat(apiData.filesize) / (1024 * 1024) : null;
     let asDocument = fileSizeMB && fileSizeMB > MAX_FILE_SIZE_MB;
 
@@ -207,7 +186,7 @@ handler.before = async (m, { conn }) => {
       );
     }
 
-    // Preparar mensaje según el tipo (igual que tu código)
+    // Preparar mensaje según el tipo
     let messageOptions;
     if (asDocument) {
       messageOptions = { 
@@ -232,12 +211,9 @@ handler.before = async (m, { conn }) => {
     // Enviar archivo
     await conn.sendMessage(m.chat, messageOptions, { quoted: m });
 
-    // Restar chocolates después del éxito
-    user.chocolates -= 2;
-    
     // Mensaje de confirmación
     await conn.sendMessage(m.chat, { 
-      text: `✅ *Descarga exitosa!*\n🍫 *Chocolates usados:* 2\n💎 *Restantes:* ${user.chocolates}` 
+      text: `✅ *Descarga exitosa!*` 
     });
 
     // Limpiar cache
