@@ -27,7 +27,7 @@ await conn.sendMessage(m.chat, {
     }
   }
 }, {
-  quoted: m
+  quoted: fkontak
 })
 
 }
