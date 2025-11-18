@@ -4,7 +4,7 @@ import * as fs from 'fs'
 
 var handler = async (m, { conn, text, participants, isOwner, isAdmin }) => {
 
-if (!m.quoted && !text) return conn.reply(m.chat, `🚩 Ingrese un texto`, m, rcanal)
+if (!m.quoted && !text) return conn.reply(m.chat, `🚩 Ingrese un texto`, m)
 
 try { 
 
@@ -46,7 +46,7 @@ await conn.relayMessage(m.chat, {extendedTextMessage:{text: `${masss}\n${htextos
 }
 handler.help = ['hidetag']
 handler.tags = ['grupo']
-handler.command = ['hidetag', 'notificar', 'notify', 'tag']
+handler.command = ['hidetag', 'notificar', 'notify', 'n']
 
 handler.admin = true
 handler.register = true
