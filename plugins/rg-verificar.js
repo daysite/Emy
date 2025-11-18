@@ -48,11 +48,10 @@ let regbot = `👤 𝗥 𝗘 𝗚 𝗜 𝗦 𝗧 𝗥 𝗢 👤
 •┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄•
 「🎁」𝗥𝗲𝗰𝗼𝗺𝗽𝗲𝗻𝘀𝗮𝘀:
 • 15 Chocolates 🍫
-• 5 MeguCoins 🪙
+• 5 Euros 🪙
 • 245 Experiencia 💸
 • 12 Tokens 💰
-
-sіgᥙᥱ ᥒᥙᥱs𝗍r᥆ 𝗍ᥱᥲm!:
+sigue el canal del bot
 ${channel2}
 •┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄•
 ${packname}`
@@ -62,7 +61,7 @@ await conn.sendMessage(m.chat, {
 externalAdReply: {
             showAdAttribution: true,
             title: '¡Usᥙᥲrі᥆ rᥱgіs𝗍rᥲძ᥆!',
-            body: '💥 ᴱˡ ᵇᵒᵗ ᵐᵃˢ ᵉˣᵖˡᵒˢᶦᵛᵒꜝꜝꜝ',
+            body: 'Aneka x Daniel',
             thumbnailUrl: imagen3,
             sourceUrl: redes,
             previewType: "PHOTO",
