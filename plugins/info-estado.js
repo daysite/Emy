@@ -20,8 +20,8 @@ let old = performance.now()
 let neww = performance.now()
 let speed = neww - old
 const used = process.memoryUsage()
-let megumin = `⭐️ \`\`\`Información - MeguminBot\`\`\` ⭐️\n\n`
-megumin += `🍄 *◜Creador◞* ⇢ David-Chian\n`
+let megumin = `⭐️ \`\`\`Información - Aneka Glow\`\`\` ⭐️\n\n`
+megumin += `🍄 *◜Creador◞* ⇢ Daniel.qsy\n`
 megumin += `❗️ *◜Prefijo◞* ⇢ [ ${usedPrefix} ]\n`
 megumin += `🌺꙰ *◜Versión◞* ⇢ ${vs}\n`
 megumin += `🌻꙰ *◜Chats Privados◞* ⇢ ${chats.length - groupsIn.length}\n`
@@ -32,7 +32,7 @@ megumin += `📌 *◜Grupos◞* ⇢ ${groupsIn.length}\n`
 megumin += `🕝 *◜Actividad◞* ⇢ ${muptime}\n`
 megumin += `🚀 *◜Velocidad◞* ⇢ ${(speed * 1000).toFixed(0) / 1000}\n`
 megumin += `🪴 *◜SubBots Activos◞* ⇢ ${totalUsers || '0'}`
-await conn.sendFile(m.chat, pp, 'megumin.jpg', megumin, m, null, rcanal)
+await conn.sendFile(m.chat, pp, 'megumin.jpg', megumin, m)
 }
 handler.help = ['status']
 handler.tags = ['info']
