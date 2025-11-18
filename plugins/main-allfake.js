@@ -37,20 +37,20 @@ global.opts['gconly'] = true
 
 //creador y otros
 global.botcommandcount = bot.botcommandCount
-global.creador = 'Wa.me/5351524614'
+global.creador = 'Wa.me/+5493884539290'
 global.ofcbot = `${conn.user.jid.split('@')[0]}`
-global.asistencia = 'Wa.me/5351524614'
-global.namechannel = '⏤͟͞ू⃪ ፝͜⁞M͢ᴇɢ፝֟ᴜᴍ⃨ɪɴ⃜✰⃔࿐/ᥫᩣᎠ꯭I𝚫⃥꯭M꯭Ꭷ꯭Ꮑ꯭Ꭰ࠭⋆̟(◣_◢)凸'
-global.namegrupo = '⁝̵̓ᝒ̷̸͙🌸̶̩ܻᝒ̷̸꯭͙𝝡꯭𝝣꯭𝗚꯭𝗨꯭𝗠꯭𝗜꯭𝗡'
-global.namecomu = '𝗖𝗼𝗺𝘂𝗻𝗶𝗱𝗮𝗱 𝝡𝝣𝗚𝗨𝗠𝗜𝗡'
-global.colab1 = 'Miguelon'
+global.asistencia = 'Wa.me/+5493884539290'
+global.namechannel = 'Aneka Chanell'
+global.namegrupo = 'Aneka Pruebas'
+global.namecomu = 'Aneka x daniel'
+global.colab1 = 'Aneka'
 global.colab2 = 'Steven'
-global.colab3 = 'Dino'
+global.colab3 = 'Rocio'
 
 //Ids channel
-global.idchannel = '120363350554513092@newsletter'
-global.canalIdM = ["120363387958443019@newsletter", "120363350554513092@newsletter","120363358338732714@newsletter", "120363420238618096@newsletter", "120363420992828502@newsletter", "120363419837575209@newsletter"]
-global.canalNombreM = ["──͟͞꘩𓎇̶𝐿̸𝑒̤𝑔֟֯፝𝑒⃯𝑛̷̈𝑑̤𝑠͡𔗓𝐵̸͜𝑜𝑡͜ꤩꤨ𝑠ꦁ⃯㍰ꫂ", "💜̶۫̄͟㉿𓏲𝐊̸͕᥆𝗍͡᥆r̤і̷𓍲̈͜𝗨̴ᥣ̥𝗍̈rᥲ̄𓊓̵̬𝐂̸͔һ͡ᥲ͓ᥒ̴͍ᥒ̷̈ᥱ̤ᥣ̵⋆͙̈么͟͞──","──̄͟͞⛛̵̅𝐌̸͡𝐞𝐠̵𝐮̲͜𝐦̷̈𝐢͜𝐧̸̤𝐁̷𝐨̶̇͜𝐭𓊓̴̻𝐂̷𝐡̶͡𝐚𝐧̈͜𝐧͜𝐞͜𝐥̵̲͞🔥̵̄͟", "⏤͟͟͞͞☆ Stellar Api - Reset ᰔᩚ", "₊· ͟͟͞͞꒰ ✩ 𝐒𝐭𝐞𝐥𝐥𝐚𝐫 𝐖𝐚𝐁𝐨𝐭 - 𝐎𝐟𝐟𝐢𝐜𝐢𝐚𝐥 𝐂𝐡𝐚𝐧𝐧𝐞𝐥 ⏤͟͟͞͞✿", "⏤͟͟͞͞☆  Night ⚡︎ Light - Team ✿"]
+global.idchannel = '120363401360971612@newsletter'
+global.canalIdM = ["120363401360971612@newsletter", "120363401360971612@newsletter","120363401360971612@newsletter", "120363401360971612@newsletter", "120363401360971612@newsletter", "120363401360971612@newsletter"]
+global.canalNombreM = ["Aneka Channell", "Aneka Channell","Aneka Channell", "Aneka Channell", "Aneka Channell", "Aneka Channell"]
 global.channelRD = await getRandomChannel()
 
 //Reacciones De Comandos.!
@@ -72,12 +72,12 @@ global.waittt = '🕒 *𝗘𝘀𝗽𝗲𝗿𝗮 𝗨𝗻 𝗠𝗼𝗺𝗲𝗻�
 global.waitttt = '🕒 *𝗘𝘀𝗽𝗲𝗿𝗮 𝗨𝗻 𝗠𝗼𝗺𝗲𝗻𝘁𝗼, 𝗦𝗼𝘆 𝗟𝗲𝗻𝘁𝗮 ...*';
 
 //Enlaces
-var canal = 'https://whatsapp.com/channel/0029Vb7Ji66KbYMTYLU9km3p'  
-let canal2 = 'https://whatsapp.com/channel/0029Vaxr2YgLCoWy2NS1Ab0a'
-var git = 'https://github.com/David-Chian' 
-var youtube = 'https://youtube.com/@davidchian4957' 
-var github = 'https://github.com/David-Chian/Megumin-Bot-MD' 
-let correo = 'noisebot40@gmail.com'
+var canal = 'https://chat.whatsapp.com/JydqOKu1AA399bMJOluzY2?mode=hqrt2'  
+let canal2 = 'https://chat.whatsapp.com/JydqOKu1AA399bMJOluzY2?mode=hqrt2'
+var git = 'https://chat.whatsapp.com/JydqOKu1AA399bMJOluzY2?mode=hqrt2' 
+var youtube = 'https://chat.whatsapp.com/JydqOKu1AA399bMJOluzY2?mode=hqrt2' 
+var github = 'https://chat.whatsapp.com/JydqOKu1AA399bMJOluzY2?mode=hqrt2' 
+let correo = 'https://chat.whatsapp.com/JydqOKu1AA399bMJOluzY2?mode=hqrt2'
 
 global.redes = [canal, canal2, git, youtube, github, correo].getRandom()
 
@@ -110,19 +110,19 @@ global.fake = { contextInfo: { isForwarded: true, forwardedNewsletterMessageInfo
 }}, { quoted: m }
 
 global.icono = [ 
-'https://files.catbox.moe/f5yora.jpg',
-'https://files.catbox.moe/ny0hrb.jpg',
-'https://files.catbox.moe/cxrcml.jpg',
-'https://files.catbox.moe/jai8du.jpg',
-'https://files.catbox.moe/61i55j.jpg',
-'https://files.catbox.moe/1dqm9i.jpg',
-'https://files.catbox.moe/0hnyny.jpg',
-'https://qu.ax/CbzQU.jpg'
+'https://files.catbox.moe/qjxfxs.jpg',
+'https://files.catbox.moe/qjxfxs.jpg',
+'https://files.catbox.moe/qjxfxs.jpg',
+'https://files.catbox.moe/qjxfxs.jpg',
+'https://files.catbox.moe/qjxfxs.jpg',
+'https://files.catbox.moe/qjxfxs.jpg',
+'https://files.catbox.moe/qjxfxs.jpg',
+'https://files.catbox.moe/qjxfxs.jpg'
 ].getRandom()
 
 /*global.rcanal = { contextInfo: { isForwarded: true, forwardedNewsletterMessageInfo: { newsletterJid: channelRD.id, serverMessageId: 100, newsletterName: channelRD.name, }, externalAdReply: { showAdAttribution: true, title: textbot, body: '💥 ꜞᴱˡ ᵇᵒᵗ ᵐᵃˢ ᵉˣᵖˡᵒˢⁱᵛᵒꜝ', mediaUrl: null, description: null, previewType: "PHOTO", thumbnailUrl: icono, sourceUrl: redes, mediaType: 1, renderLargerThumbnail: false }, }, }*/
 
-global.rcanal = {contextInfo: {forwardingScore: 2025, isForwarded: true, externalAdReply: {title: textbot, body: '💥 ꜞᴱˡ ᵇᵒᵗ ᵐᵃˢ ᵉˣᵖˡᵒˢⁱᵛᵒꜝ', sourceUrl: redes, thumbnailUrl: icono}}}
+global.rcanal = {contextInfo: {forwardingScore: 2025, isForwarded: true, externalAdReply: {title: textbot, body: 'Aneka x Daniel', sourceUrl: redes, thumbnailUrl: icono}}}
 }
 
 export default handler
