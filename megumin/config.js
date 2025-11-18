@@ -54,11 +54,11 @@ global.namechannel = 'Aneka Channel'
 
 
 //• ↳ ◜𝑰𝑴𝑨́𝑮𝑬𝑵𝑬𝑺◞ • 🌇
-global.imagen1 = 'https://files.catbox.moe/6lhjit.jpg'
-global.imagen2 = 'https://files.catbox.moe/bm0q3s.jpg'
-global.imagen3 = 'https://files.catbox.moe/zrbazr.jpg'
-global.imagenadult = 'https://files.catbox.moe/3dbuvw.jpg'
-global.logo = 'https://files.catbox.moe/magmik.jpg'
+global.imagen1 = 'https://files.catbox.moe/44z4jd.jpg'
+global.imagen2 = 'https://files.catbox.moe/pen16d.jpg'
+global.imagen3 = 'https://files.catbox.moe/r6k372.jpg'
+global.imagenadult = 'https://files.catbox.moe/r6k372.jpg'
+global.logo = 'https://files.catbox.moe/qjxfxs.jpg'
 
 //• ↳ ◜𝑭𝑨𝑲𝑬 𝑬𝑺𝑻𝑰𝑳𝑶◞ • 🪩
 global.estilo = { key: {  fromMe: false, participant: `0@s.whatsapp.net`, ...(false ? { remoteJid: "5219992095479-1625305606@g.us" } : {}) }, message: { orderMessage: { itemCount : -999999, status: 1, surface : 1, message: 'Aneka', orderTitle: 'Bang', thumbnailUrl: logo, sellerJid: '0@s.whatsapp.net'}}}
