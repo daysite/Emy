@@ -1,35 +1,22 @@
-var handler = async (m, { conn,usedPrefix, command, text }) => {
-
-if (isNaN(text) && !text.match(/@/g)){
-
-} else if (isNaN(text)) {
-var number = text.split`@`[1]
-} else if (!isNaN(text)) {
-var number = text
-}
-
-if (!text && !m.quoted) return conn.reply(m.chat, `🚩 *Responda a un participante del grupo para asignarle admin.*`, m, rcanal)
-if (number.length > 13 || (number.length < 11 && number.length > 0)) return conn.reply(m.chat, `✨️ *Debe de responder o mensionar a una persona para usar este comando.*`, m, fake)
-
+var handler = async (m, { conn, usedPrefix, command, text, groupMetadata, isAdmin }) => {
+let mentionedJid = await m.mentionedJid
+let user = mentionedJid && mentionedJid.length ? mentionedJid[0] : m.quoted && await m.quoted.sender ? await m.quoted.sender : null
+if (!user) return conn.reply(m.chat, `❀ Debes mencionar a un usuario para poder promoverlo a administrador.`, m)
 try {
-if (text) {
-var user = number + '@s.whatsapp.net'
-} else if (m.quoted.sender) {
-var user = m.quoted.sender
-} else if (m.mentionedJid) {
-var user = number + '@s.whatsapp.net'
-} 
+const groupInfo = await conn.groupMetadata(m.chat)
+const ownerGroup = groupInfo.owner || m.chat.split('-')[0] + '@s.whatsapp.net'
+if (user === ownerGroup || groupInfo.participants.some(p => p.id === user && p.admin))
+return conn.reply(m.chat, 'ꕥ El usuario mencionado ya tiene privilegios de administrador.', m)
+await conn.groupParticipantsUpdate(m.chat, [user], 'promote')
+await conn.reply(m.chat, `❀ Fue agregado como admin del grupo con exito.`, m)
 } catch (e) {
-} finally {
-conn.groupParticipantsUpdate(m.chat, [user], 'promote')
-conn.reply(m.chat, `✅ *Fue agregado como admin del grupo con exito.*`, m, fake)
-}
+conn.reply(m.chat, `⚠︎ Se ha producido un problema.\n> Usa *${usedPrefix}report* para informarlo.\n\n${e.message}`, m)
+}}
 
-}
 handler.help = ['promote']
 handler.tags = ['grupo']
-handler.command = ['promote','darpija', 'promover']
-
+handler.command = ['promote', 'promover']
+handler.group = true
 handler.admin = true
 handler.botAdmin = true
 
