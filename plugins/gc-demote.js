@@ -1,34 +1,24 @@
-var handler = async (m, { conn,usedPrefix, command, text }) => {
-
-if (isNaN(text) && !text.match(/@/g)){
-
-} else if (isNaN(text)) {
-var number = text.split`@`[1]
-} else if (!isNaN(text)) {
-var number = text
-}
-
-if (!text && !m.quoted) return conn.reply(m.chat, `🚩 *Mensione a un administrador para usar este comando.*`, m, rcanal)
-if (number.length > 13 || (number.length < 11 && number.length > 0)) return conn.reply(m.chat, `✨️ *Error, debe de mensionar a un administrador.*`, m, fake)
-
+var handler = async (m, { conn, usedPrefix, command, text, groupMetadata }) => {
+let mentionedJid = await m.mentionedJid
+let user = mentionedJid && mentionedJid.length ? mentionedJid[0] : m.quoted && await m.quoted.sender ? await m.quoted.sender : null
+if (!user) return conn.reply(m.chat, `❀ Debes mencionar a un usuario para poder promoverlo a administrador.`, m)
 try {
-if (text) {
-var user = number + '@s.whatsapp.net'
-} else if (m.quoted.sender) {
-var user = m.quoted.sender
-} else if (m.mentionedJid) {
-var user = number + '@s.whatsapp.net'
-} 
+const groupInfo = await conn.groupMetadata(m.chat)
+const ownerGroup = groupInfo.owner || m.chat.split`-`[0] + '@s.whatsapp.net'
+const ownerBot = global.owner[0][0] + '@s.whatsapp.net'
+if (user === conn.user.jid) return conn.reply(m.chat, `ꕥ No puedes degradar al bot.`, m)
+if (user === ownerGroup) return conn.reply(m.chat, `ꕥ No puedes degradar al creador del grupo.`, m)
+if (user === ownerBot) return conn.reply(m.chat, `ꕥ No puedes degradar al propietario del bot.`, m)
+await conn.groupParticipantsUpdate(m.chat, [user], 'demote')
+conn.reply(m.chat, `❀ Fue descartado como admin.`, m)
 } catch (e) {
-} finally {
-conn.groupParticipantsUpdate(m.chat, [user], 'demote')
-conn.reply(m.chat, `✅ *Fue descartado como admin.*`, m, fake)
-}
+conn.reply(m.chat, `⚠︎ Se ha producido un problema.\n> Usa *${usedPrefix}report* para informarlo.\n\n${e.message}`, m)
+}}
 
-}
 handler.help = ['demote']
 handler.tags = ['grupo']
-handler.command = ['demote','quitarpija', 'degradar']
+handler.command = ['demote', 'degradar']
+handler.group = true
 handler.admin = true
 handler.botAdmin = true
 
