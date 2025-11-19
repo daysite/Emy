@@ -27,7 +27,7 @@ let who = m.mentionedJid && m.mentionedJid[0] ? m.mentionedJid[0] : m.fromMe ? c
 let mentionedJid = [who]
 let perfil = await conn.profilePictureUrl(who, 'image').catch(_ => 'https://qu.ax/QGAVS.jpg')
 let taguser = '@' + m.sender.split("@s.whatsapp.net")[0]
-const vid = ['https://telegra.ph/file/32e696946433c03588726.mp4', 'https://telegra.ph/file/5293a73eb90a920f8948b.mp4', 'https://telegra.ph/file/d5ed2537cb22b628d8ef1.mp4']
+const vid = ['https://files.catbox.moe/t4r0gq.gif', 'https://files.catbox.moe/t4r0gq.gif', 'https://files.catbox.moe/t4r0gq.gif']
 
 let menu = `*🥟 황현진 ₊˚⊹ 🥢*
 
