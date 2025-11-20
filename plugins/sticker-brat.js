@@ -11,19 +11,40 @@ let handler = async (m, { conn, usedPrefix, command, text, args }) => {
     await conn.sendMessage(m.chat, { react: { text: '🔄', key: m.key } })
 
     const encodedText = encodeURIComponent(text)
-    const apiUrl = `https://api.zenzxz.my.id/api/maker/bratvid?text=${encodedText}`
-    const response = await fetch(apiUrl)
     
-    if (!response.ok) {
-      throw new Error(`Error en la API: ${response.status} ${response.statusText}`)
+    // Intentar con múltiples APIs
+    const apis = [
+      `https://api.zenzxz.my.id/api/maker/bratvid?text=${encodedText}`,
+      `https://api.lolhuman.xyz/api/ephoto2/brattext?apikey=yourkey&text=${encodedText}`,
+      `https://violetics.pw/api/maker/brat-text?apikey=beta&text=${encodedText}`
+    ]
+
+    let videoBuffer
+    let success = false
+
+    for (let apiUrl of apis) {
+      try {
+        console.log('Probando API:', apiUrl)
+        const response = await fetch(apiUrl)
+        
+        if (response.ok) {
+          videoBuffer = await response.buffer()
+          const fileInfo = await fileTypeFromBuffer(videoBuffer)
+          
+          if (fileInfo && fileInfo.mime.startsWith('video/')) {
+            console.log('API exitosa:', apiUrl)
+            success = true
+            break
+          }
+        }
+      } catch (apiError) {
+        console.log('API falló:', apiUrl, apiError.message)
+        continue
+      }
     }
 
-    const videoBuffer = await response.buffer()
-    
-    // Verificar que sea un video válido
-    const fileInfo = await fileTypeFromBuffer(videoBuffer)
-    if (!fileInfo || !fileInfo.mime.startsWith('video/')) {
-      throw new Error('La API no devolvió un video válido')
+    if (!success) {
+      throw new Error('Todas las APIs fallaron. Intenta más tarde.')
     }
 
     await conn.sendVideoAsSticker(m.chat, videoBuffer, m, { 
@@ -37,14 +58,13 @@ let handler = async (m, { conn, usedPrefix, command, text, args }) => {
     console.error('Error en brat:', error)
     await conn.sendMessage(m.chat, { react: { text: '❌', key: m.key } })
     
-    const errorMessage = `${getBotEmoji(global.mePn)} Error al generar el video sticker:\n\n\`\`\`${error.stack || error.message}\`\`\``
+    const errorMessage = `${getBotEmoji(global.mePn)} Error al generar el video sticker.\n\n${error.message}`
     await m.reply(errorMessage)
   }
 }
 
-// Función para obtener emoji del bot (debes definirla según tu configuración)
+// Función para obtener emoji del bot
 function getBotEmoji(mePn) {
-  // Define tu lógica para obtener emojis
   return '🤖'
 }
 
