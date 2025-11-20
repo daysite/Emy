@@ -1,75 +1,60 @@
-import fetch from 'node-fetch'
-import { fileTypeFromBuffer } from 'file-type'
+import { sticker } from '../lib/sticker.js';
+import axios from 'axios';
 
-let handler = async (m, { conn, usedPrefix, command, text, args }) => {
-  if (!text) {
-    await conn.sendMessage(m.chat, { react: { text: '❗', key: m.key } })
-    return m.reply(`${getBotEmoji(global.mePn)} Ingresa un texto para el video.\n\nEjemplo: *${usedPrefix + command} Hola mundo*`)
-  }
+const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
-  try {
-    await conn.sendMessage(m.chat, { react: { text: '🔄', key: m.key } })
-
-    const encodedText = encodeURIComponent(text)
-    
-    // Intentar con múltiples APIs
-    const apis = [
-      `https://api.zenzxz.my.id/api/maker/bratvid?text=${encodedText}`,
-      `https://api.lolhuman.xyz/api/ephoto2/brattext?apikey=yourkey&text=${encodedText}`,
-      `https://violetics.pw/api/maker/brat-text?apikey=beta&text=${encodedText}`
-    ]
-
-    let videoBuffer
-    let success = false
-
-    for (let apiUrl of apis) {
-      try {
-        console.log('Probando API:', apiUrl)
-        const response = await fetch(apiUrl)
-        
-        if (response.ok) {
-          videoBuffer = await response.buffer()
-          const fileInfo = await fileTypeFromBuffer(videoBuffer)
-          
-          if (fileInfo && fileInfo.mime.startsWith('video/')) {
-            console.log('API exitosa:', apiUrl)
-            success = true
-            break
-          }
+const fetchSticker = async (text, attempt = 1) => {
+    try {
+        const res = await axios.get('https://kepolu-brat.hf.space/brat', {
+            params: { q: text },
+            responseType: 'arraybuffer',
+        });
+        return res.data;
+    } catch (err) {
+        if (err.response?.status === 429 && attempt <= 3) {
+            const retryAfter = err.response.headers['retry-after'] || 5;
+            await delay(retryAfter * 1000);
+            return fetchSticker(text, attempt + 1);
         }
-      } catch (apiError) {
-        console.log('API falló:', apiUrl, apiError.message)
-        continue
-      }
+        throw err;
+    }
+};
+
+let handler = async (m, { conn, text }) => {
+    if (!text) {
+        await m.react('⌛')
+        return conn.sendMessage(m.chat, {
+            text: `🍟. Ingrese el texto para hacer el sticker`,
+        }, { quoted: m });
     }
 
-    if (!success) {
-      throw new Error('Todas las APIs fallaron. Intenta más tarde.')
+    // Reacciona con ⏳ al iniciar el procesamiento
+    await m.react('⏳')
+
+    try {
+        const buffer = await fetchSticker(text);
+        const stiker = await sticker(buffer, false,
+'propietario del bot:\nLucxxs.qzy x Aneka\n\n', global.botname, '\n\n', global.authN);
+
+        if (stiker) {
+            // Reacciona con ✅ al enviar el sticker exitosamente
+            await m.react('✅')
+            return conn.sendFile(m.chat, stiker, 'brat.webp', '', m);
+        } else {
+            throw new Error('No se pudo generar el sticker. ¿Qué texto tan feo pusiste? 🤨');
+        }
+    } catch (err) {
+        // Reacciona con 💀 si hay error
+        await m.react('💀')
+        console.error(err);
+        return conn.sendMessage(m.chat, {
+            text: `💀 Error al generar el sticker:\n${err.message || 'Algo salió mal, como tú.'}`,
+        }, { quoted: m });
     }
+};
 
-    await conn.sendVideoAsSticker(m.chat, videoBuffer, m, { 
-      packname: 'Neveloopp Pack', 
-      author: 'Neveloopp' 
-    })
+handler.command = ['brat'];
+handler.tags = ['sticker'];
+handler.help = ['brat *<texto>*'];
 
-    await conn.sendMessage(m.chat, { react: { text: '✅', key: m.key } })
-
-  } catch (error) {
-    console.error('Error en brat:', error)
-    await conn.sendMessage(m.chat, { react: { text: '❌', key: m.key } })
-    
-    const errorMessage = `${getBotEmoji(global.mePn)} Error al generar el video sticker.\n\n${error.message}`
-    await m.reply(errorMessage)
-  }
-}
-
-// Función para obtener emoji del bot
-function getBotEmoji(mePn) {
-  return '🤖'
-}
-
-handler.help = ['brat <texto>']
-handler.tags = ['sticker', 'fun']
-handler.command = /^(brat)$/i
-
-export default handler
+export default handler;
